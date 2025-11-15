@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我想你了</title>
+
+<style>
+    body {
+        margin: 0;
+        background: #eaf3f9;
+        font-family: "PingFang SC", Arial, sans-serif;
+        overflow: hidden;
+        user-select: none;
+    }
+
+    /* 输入框按钮 */
+    #inputBtn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 50px;
+        background: #ff7eb3;
+        color: white;
+        font-size: 16px;
+        border: none;
+        box-shadow: 0 5px 14px rgba(255, 126, 179, .4);
+        z-index: 999;
+    }
+
+    .card {
+        position: absolute;
+        padding: 14px 22px;
+        min-width: 140px;
+        border-radius: 14px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, .15);
+        opacity: 0;
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        color: #333;
+        animation: floatIn 1.2s cubic-bezier(.25,.8,.25,1) forwards;
+        backdrop-filter: blur(8px);
+    }
+
+    .emoji {
+        margin-right: 8px;
+    }
+
+    @keyframes floatIn {
+        0% {
+            transform: translateY(40px) scale(0.85);
+            opacity: 0;
+        }
+        100% {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<button id="inputBtn">＋ 自己写一句</button>
+
+<audio id="bgm" src="https://cdn.jsdelivr.net/gh/kyrie25/CDN-music/quiet.mp3" autoplay loop></audio>
+
+<script>
+    // 100 条提示语
+    const messages = [
+        "今天也要元气满满","希望你一直开心","愿你心想事成","好运正在路上","保持微笑呀","我想你了",
+        "别太累了","早点休息哦","记得吃早餐","午餐也不要忘了吃","晚餐也要按时吃","多喝热水","天气变凉了记得添衣",
+        "照顾好自己","你值得被温柔以待","你真的很棒","继续加油呀","梦想成真","好运会眷顾你的","你已经很努力了",
+        "放轻松一点","愿你永远被爱","你值得所有美好","今晚做个好梦","希望你今天过得开心","明天也会是好日子",
+        "愿你被温柔包围","世界正在偷偷奖励你","你是独一无二的","你的笑容很珍贵","期待下一次见面","你今天看起来很不错",
+        "深呼吸，会好起来的","阳光会照进来的","你不是一个人","我一直在","愿你被生活温柔以待","愿你的努力都有回报",
+        "愿你顺顺利利","祝你心情愉快","希望一切顺利","愿你所想皆所愿","愿你生活甜甜的","你值得被认真珍惜",
+        "要相信自己呀","未来会更好的","你一定能做到","愿你的每一天都闪闪发亮","今天也辛苦啦","记得给自己一点奖励",
+        "保持好心情","祝你事事顺利","愿你每天有好消息","相信奇迹吧","幸福正向你跑来","你很好，不需要再变了",
+        "你的存在很重要","你在慢慢变好","愿你被爱包围","愿你心里永远有光","愿你永远自由又温柔",
+        "你值得更好的未来","愿你星辰常伴，万事顺遂","请继续勇敢前进","你值得所有的爱","别忘了你有多优秀",
+        "我在远处为你加油","愿你的生活充满惊喜","愿你永不失望，永远热泪盈眶","愿你被世界温柔以待",
+        "祝你天天开心","愿你永远拥有美好心情","你永远值得被喜欢","保持可爱，保持热爱",
+        "愿所有烦恼都离你而去","愿你前程似锦","愿好运全部跟着你","你值得更多快乐","你值得更好的爱",
+        "愿你一切顺心如意","你已经很好了","愿你未来可期","愿你眼里有光心里有爱","愿你不再迷茫",
+        "愿你被生活偏爱","愿你跨过所有烦恼","你会变得更加优秀","希望幸福永远陪着你",
+        "愿你每天都有小快乐","愿你拥有最温柔的善意","愿你被温柔相待","你值得被偏爱","愿你不再孤单",
+        "愿你永远幸福","愿你的生活明朗","愿你眉目舒展","愿你拥有灿烂笑容",
+        "愿你今天也被好运包围","愿你在人生路上更顺利"
+    ];
+
+    // 随机渐变色
+    function randomGradient() {
+        const colors = [
+            ["#ff9a9e", "#fad0c4"],
+            ["#a18cd1", "#fbc2eb"],
+            ["#fad0c4", "#ffd1ff"],
+            ["#ffecd2", "#fcb69f"],
+            ["#d4fc79", "#96e6a1"],
+            ["#84fab0", "#8fd3f4"],
+            ["#a1c4fd", "#c2e9fb"],
+            ["#fccb90", "#d57eeb"]
+        ];
+        const c = colors[Math.floor(Math.random() * colors.length)];
+        return `linear-gradient(135deg, ${c[0]}, ${c[1]})`;
+    }
+
+    // 创建卡片
+    function createCard(text = null) {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.style.background = randomGradient();
+        card.style.zIndex = Math.floor(Math.random() * 50); // 层级堆叠
+
+        const message = text || messages[Math.floor(Math.random() * messages.length)];
+        card.innerHTML = `<span class="emoji">💖 提示</span> ${message}`;
+
+        // 随机位置
+        const x = Math.random() * (window.innerWidth - 200);
+        const y = Math.random() * (window.innerHeight - 100);
+
+        card.style.left = `${x}px`;
+        card.style.top = `${y}px`;
+
+        document.body.appendChild(card);
+    }
+
+    // 定时生成
+    setInterval(() => createCard(), 100);
+
+    // 点击页面也生成
+    document.body.addEventListener("click", () => createCard());
+
+    // 自定义输入
+    document.getElementById("inputBtn").onclick = function () {
+        const text = prompt("写一句你想发送的提示：");
+        if (text && text.trim()) createCard(text.trim());
+    };
+</script>
+
+</body>
+</html>
